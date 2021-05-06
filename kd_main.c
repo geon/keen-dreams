@@ -502,26 +502,6 @@ static	char			*EntryParmStrings[] = {"detour",nil};
 
 void main (void)
 {
-	boolean LaunchedFromShell = false;
-	short i;
-
-	for (i = 1;i < _argc;i++)
-	{
-		switch (US_CheckParm(_argv[i],EntryParmStrings))
-		{
-		case 0:
-			LaunchedFromShell = true;
-			break;
-		}
-	}
-
-	if (!LaunchedFromShell)
-	{
-		clrscr();
-		puts("You must type START at the DOS prompt to run KEEN DREAMS.");
-		exit(0);
-	}
-
 	InitGame();
 
 	DemoLoop();					// DemoLoop calls Quit when everything is done
