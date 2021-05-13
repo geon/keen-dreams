@@ -252,6 +252,8 @@ void VW_SetDefaultColors(void)
 }
 
 
+#define fadeDelay 6
+
 void VW_FadeOut(void)
 {
 #if GRMODE == EGAGR
@@ -261,7 +263,7 @@ void VW_FadeOut(void)
 	{
 	  colors[i][16] = bordercolor;
 	  setPalette(colors[i]);
-	  VW_WaitVBL(6);
+	  VW_WaitVBL(fadeDelay);
 	}
 	screenfaded = true;
 #endif
@@ -277,7 +279,7 @@ void VW_FadeIn(void)
 	{
 	  colors[i][16] = bordercolor;
 	  setPalette(colors[i]);
-	  VW_WaitVBL(6);
+	  VW_WaitVBL(fadeDelay);
 	}
 	screenfaded = false;
 #endif
@@ -292,7 +294,7 @@ void VW_FadeUp(void)
 	{
 	  colors[i][16] = bordercolor;
 	  setPalette(colors[i]);
-	  VW_WaitVBL(6);
+	  VW_WaitVBL(fadeDelay);
 	}
 	screenfaded = true;
 #endif
@@ -307,7 +309,7 @@ void VW_FadeDown(void)
 	{
 	  colors[i][16] = bordercolor;
 	  setPalette(colors[i]);
-	  VW_WaitVBL(6);
+	  VW_WaitVBL(fadeDelay);
 	}
 	screenfaded = false;
 #endif
