@@ -215,7 +215,7 @@ void VW_SetScreenMode (int grmode)
 =============================================================================
 */
 
-char colors[7][17]=
+unsigned char colors[7][17]=
 {{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
  {0,0,0,0,0,0,0,0,0,1,2,3,4,5,6,7,0},
  {0,0,0,0,0,0,0,0,0x18,0x19,0x1a,0x1b,0x1c,0x1d,0x1e,0x1f,0},
@@ -224,12 +224,50 @@ char colors[7][17]=
  {0x1f,0x1f,0x1f,0x1f,0x1f,0x1f,0x1f,0x1f,0x1f,0x1f,0x1f,0x1f,0x1f,0x1f,0x1f,0x1f,0x1f}};
 
 
+// Use the VGA palette while in EGA mode to enable 16/64 colors in low resolution.
 void setPalette (char *colors)
 {
-	_ES=FP_SEG(colors);
-	_DX=FP_OFF(colors);
-	_AX=0x1002;
-	geninterrupt(0x10);
+	unsigned char j;
+
+	for (j=0; j<16; ++j) {
+		unsigned char color = colors[j];
+
+		// The palette is split, and uses index 0-7, and 16-23.
+		unsigned char vgaIndex = j<8 ? j : j+8;
+
+		// Decode the IRGB format normally used in 320x200 EGA,
+		// 0x20 = bit [5]
+		// 0x4 = bit [2]
+		// 0x2 = bit [1]
+		// 0x1 = bit [0]
+		boolean highIntensity = (color & 0x10) ? true : false; 
+		unsigned char red   = (color & 0x4) ? (highIntensity ? 63 : 42) : (highIntensity ? 21 : 0);
+		unsigned char green = (color & 0x2) ? (highIntensity ? 63 : 42) : (highIntensity ? 21 : 0);
+		unsigned char blue  = (color & 0x1) ? (highIntensity ? 63 : 42) : (highIntensity ? 21 : 0);
+
+		// Emulate the dark yellow/brown special case.
+		if (red == 42 && green == 42 && blue == 0) {
+			green = 21;
+		}
+
+		// Set the VGA palette index.
+		asm mov dx, 0x3c8
+		asm mov al, vgaIndex
+		asm out dx, al
+
+		// Write all values to the same register, consecutively.
+		asm  mov dx, 0x3c9
+		asm  mov al, red
+		asm  out dx, al
+
+		asm  mov dx, 0x3c9
+		asm  mov al, green
+		asm  out dx, al
+
+		asm  mov dx, 0x3c9
+		asm  mov al, blue
+		asm  out dx, al
+	}
 }
 
 
@@ -252,7 +290,7 @@ void VW_SetDefaultColors(void)
 }
 
 
-#define fadeDelay 6
+#define fadeDelay 20
 
 void VW_FadeOut(void)
 {
