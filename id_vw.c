@@ -217,9 +217,9 @@ void VW_SetScreenMode (int grmode)
 
 unsigned char colors[7][17]=
 {{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
- {0,0,0,0,0,0,0,0,0,1,2,3,4,5,6,7,0},
- {0,0,0,0,0,0,0,0,0x18,0x19,0x1a,0x1b,0x1c,0x1d,0x1e,0x1f,0},
- {0,1,2,3,4,5,6,7,0x18,0x19,0x1a,0x1b,0x1c,0x1d,0x1e,0x1f,0},
+ {0,0,0,0,0,0,0,0,0,1,2,3,4,5,0x14,7,0},
+ {0,0,0,0,0,0,0,0,0x38,0x39,0x3a,0x3b,0x3c,0x3d,0x3e,0x3f,0},
+ {0,1,2,3,4,5,0x14,7,0x38,0x39,0x3a,0x3b,0x3c,0x3d,0x3e,0x3f,0},
  {0,1,2,3,4,5,6,7,0x1f,0x1f,0x1f,0x1f,0x1f,0x1f,0x1f,0x1f,0},
  {0x1f,0x1f,0x1f,0x1f,0x1f,0x1f,0x1f,0x1f,0x1f,0x1f,0x1f,0x1f,0x1f,0x1f,0x1f,0x1f,0x1f}};
 
@@ -235,20 +235,10 @@ void setPalette (char *colors)
 		// The palette is split, and uses index 0-7, and 16-23.
 		unsigned char vgaIndex = j<8 ? j : j+8;
 
-		// Decode the IRGB format normally used in 320x200 EGA,
-		// 0x20 = bit [5]
-		// 0x4 = bit [2]
-		// 0x2 = bit [1]
-		// 0x1 = bit [0]
-		boolean highIntensity = (color & 0x10) ? true : false; 
-		unsigned char red   = (color & 0x4) ? (highIntensity ? 63 : 42) : (highIntensity ? 21 : 0);
-		unsigned char green = (color & 0x2) ? (highIntensity ? 63 : 42) : (highIntensity ? 21 : 0);
-		unsigned char blue  = (color & 0x1) ? (highIntensity ? 63 : 42) : (highIntensity ? 21 : 0);
-
-		// Emulate the dark yellow/brown special case.
-		if (red == 42 && green == 42 && blue == 0) {
-			green = 21;
-		}
+		// Decode the rgbRGB format normally used in 640x350 EGA,
+		unsigned char red   = ((color & 0x20) ? 21 : 0) + ((color & 0x4) ? 42 : 0);
+		unsigned char green = ((color & 0x10) ? 21 : 0) + ((color & 0x2) ? 42 : 0);
+		unsigned char blue  = ((color & 0x08) ? 21 : 0) + ((color & 0x1) ? 42 : 0);
 
 		// Set the VGA palette index.
 		asm mov dx, 0x3c8
