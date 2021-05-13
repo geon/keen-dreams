@@ -224,6 +224,15 @@ char colors[7][17]=
  {0x1f,0x1f,0x1f,0x1f,0x1f,0x1f,0x1f,0x1f,0x1f,0x1f,0x1f,0x1f,0x1f,0x1f,0x1f,0x1f,0x1f}};
 
 
+void setPalette (char *colors)
+{
+	_ES=FP_SEG(colors);
+	_DX=FP_OFF(colors);
+	_AX=0x1002;
+	geninterrupt(0x10);
+}
+
+
 void VW_ColorBorder (int color)
 {
 	_AH=0x10;
@@ -237,10 +246,7 @@ void VW_SetDefaultColors(void)
 {
 #if GRMODE == EGAGR
 	colors[3][16] = bordercolor;
-	_ES=FP_SEG(&colors[3]);
-	_DX=FP_OFF(&colors[3]);
-	_AX=0x1002;
-	geninterrupt(0x10);
+	setPalette(colors[3]);
 	screenfaded = false;
 #endif
 }
@@ -254,10 +260,7 @@ void VW_FadeOut(void)
 	for (i=3;i>=0;i--)
 	{
 	  colors[i][16] = bordercolor;
-	  _ES=FP_SEG(&colors[i]);
-	  _DX=FP_OFF(&colors[i]);
-	  _AX=0x1002;
-	  geninterrupt(0x10);
+	  setPalette(colors[i]);
 	  VW_WaitVBL(6);
 	}
 	screenfaded = true;
@@ -273,10 +276,7 @@ void VW_FadeIn(void)
 	for (i=0;i<4;i++)
 	{
 	  colors[i][16] = bordercolor;
-	  _ES=FP_SEG(&colors[i]);
-	  _DX=FP_OFF(&colors[i]);
-	  _AX=0x1002;
-	  geninterrupt(0x10);
+	  setPalette(colors[i]);
 	  VW_WaitVBL(6);
 	}
 	screenfaded = false;
@@ -291,10 +291,7 @@ void VW_FadeUp(void)
 	for (i=3;i<6;i++)
 	{
 	  colors[i][16] = bordercolor;
-	  _ES=FP_SEG(&colors[i]);
-	  _DX=FP_OFF(&colors[i]);
-	  _AX=0x1002;
-	  geninterrupt(0x10);
+	  setPalette(colors[i]);
 	  VW_WaitVBL(6);
 	}
 	screenfaded = true;
@@ -309,10 +306,7 @@ void VW_FadeDown(void)
 	for (i=5;i>2;i--)
 	{
 	  colors[i][16] = bordercolor;
-	  _ES=FP_SEG(&colors[i]);
-	  _DX=FP_OFF(&colors[i]);
-	  _AX=0x1002;
-	  geninterrupt(0x10);
+	  setPalette(colors[i]);
 	  VW_WaitVBL(6);
 	}
 	screenfaded = false;
