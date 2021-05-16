@@ -281,18 +281,35 @@ void VW_SetDefaultColors(void)
 
 
 #define fadeDelay 20
+#define flickers 2
+
+
+void flickerPalettes(char *colorsA, char *colorsB, int numFlicks)
+{
+	// Flicker to create temporal dithering.
+	int i;
+	for (i=0;i<numFlicks;i++) {
+		setPalette(colorsA);
+		VW_WaitVBL(1);
+
+		setPalette(colorsB);
+		VW_WaitVBL(1);
+	}
+}
+
 
 void VW_FadeOut(void)
 {
 #if GRMODE == EGAGR
 	int i;
 
-	for (i=3;i>=0;i--)
-	{
-	  colors[i][16] = bordercolor;
-	  setPalette(colors[i]);
-	  VW_WaitVBL(fadeDelay);
-	}
+	flickerPalettes(colors[2], colors[3], flickers);
+	flickerPalettes(colors[2], colors[2], flickers);
+	flickerPalettes(colors[1], colors[2], flickers);
+	flickerPalettes(colors[1], colors[1], flickers);
+	flickerPalettes(colors[0], colors[1], flickers);
+	flickerPalettes(colors[0], colors[0], flickers);
+
 	screenfaded = true;
 #endif
 }
@@ -303,12 +320,13 @@ void VW_FadeIn(void)
 #if GRMODE == EGAGR
 	int i;
 
-	for (i=0;i<4;i++)
-	{
-	  colors[i][16] = bordercolor;
-	  setPalette(colors[i]);
-	  VW_WaitVBL(fadeDelay);
-	}
+	flickerPalettes(colors[0], colors[0], flickers);
+	flickerPalettes(colors[0], colors[1], flickers);
+	flickerPalettes(colors[1], colors[1], flickers);
+	flickerPalettes(colors[1], colors[2], flickers);
+	flickerPalettes(colors[2], colors[2], flickers);
+	flickerPalettes(colors[2], colors[3], flickers);
+
 	screenfaded = false;
 #endif
 }
